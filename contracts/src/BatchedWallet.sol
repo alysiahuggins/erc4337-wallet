@@ -1,9 +1,29 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.19;
+pragma solidity ^0.8.12;
 
 import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import {IEntryPoint} from "account-abstraction/interfaces/IEntryPoint.sol";
 
 contract BatchedWallet is Initializable{
+    address public owner;
+    IEntryPoint private immutable _entryPoint;
+
+    event BatchedWalletInitialized(IEntryPoint indexed entryPoint, address owners);
+
+
+    constructor(IEntryPoint entryPoint){
+        _entryPoint = entryPoint;
+        _disableInitializers(); //prevent the this implementation from being used by locking it
+    }
+
+    function initialize(address walletOwner) public initializer {
+        _initialize(walletOwner);
+    }
+
+    function _initialize(address walletOwner) internal virtual {
+        owner = walletOwner;
+        emit BatchedWalletInitialized(_entryPoint, owner);
+    }
 
     /**
     execute a transaction directly from user or entry point
