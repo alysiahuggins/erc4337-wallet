@@ -6,8 +6,9 @@ import {IEntryPoint} from "account-abstraction/interfaces/IEntryPoint.sol";
 import {BaseAccount} from "account-abstraction/core/BaseAccount.sol";
 import {UserOperation} from "account-abstraction/interfaces/UserOperation.sol";
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import {TokenCallbackHandler} from "./callback/TokenCallbackHandler.sol";
 
-contract BatchedWallet is Initializable, BaseAccount{
+contract BatchedWallet is Initializable, BaseAccount, TokenCallbackHandler{
     using ECDSA for bytes32;
 
     address public owner;
