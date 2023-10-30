@@ -1,10 +1,15 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.12;
+pragma solidity >=0.8.12 <=0.8.20;
 
 import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import {IEntryPoint} from "account-abstraction/interfaces/IEntryPoint.sol";
+import {BaseAccount} from "account-abstraction/core/BaseAccount.sol";
+import {UserOperation} from "account-abstraction/interfaces/UserOperation.sol";
+import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-contract BatchedWallet is Initializable{
+contract BatchedWallet is Initializable, BaseAccount{
+    using ECDSA for bytes32;
+
     address public owner;
     IEntryPoint private immutable _entryPoint;
 
@@ -18,8 +23,8 @@ contract BatchedWallet is Initializable{
         _;
     }
 
-    constructor(IEntryPoint entryPoint){
-        _entryPoint = entryPoint;
+    constructor(IEntryPoint batchedWalletEntryPoint){
+        _entryPoint = batchedWalletEntryPoint;
         _disableInitializers(); //prevent the this implementation from being used by locking it
     }
 
@@ -70,4 +75,20 @@ contract BatchedWallet is Initializable{
             }
         }
     }
+
+    function entryPoint() public view override returns (IEntryPoint) {
+        return _entryPoint;
+    }
+
+    function _validateSignature(UserOperation calldata userOp, bytes32 userOpHash)
+    internal 
+    override 
+    virtual 
+    returns (uint256 validationData) {
+        bytes32 hash = userOpHash.toEthSignedMessageHash();
+        if (owner != hash.recover(userOp.signature))
+            return SIG_VALIDATION_FAILED;
+        return 0;
+    }
+
 }
