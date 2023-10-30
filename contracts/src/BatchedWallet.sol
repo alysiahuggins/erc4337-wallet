@@ -10,6 +10,13 @@ contract BatchedWallet is Initializable{
 
     event BatchedWalletInitialized(IEntryPoint indexed entryPoint, address owners);
 
+    modifier _requireFromEntryPointOrFactory() {
+        require(
+            msg.sender == address(_entryPoint) || msg.sender == owner,
+            "only entry point or wallet owner can call"
+        );
+        _;
+    }
 
     constructor(IEntryPoint entryPoint){
         _entryPoint = entryPoint;
@@ -28,14 +35,18 @@ contract BatchedWallet is Initializable{
     /**
     execute a transaction directly from user or entry point
     TODO: restrict access to entry Contract and owner */
-    function execute(address dest, uint256 value, bytes calldata func) external {
+    function execute(address dest, uint256 value, bytes calldata func) 
+    external 
+    _requireFromEntryPointOrFactory{
         _call(dest, value, func);
     }
 
     /**
     executes batch of transactions directly from user or entry point
     TODO: restrict access to entry Contract and owner */
-    function executeBatch(address[] calldata dest, uint256[] calldata value, bytes[] calldata func) external {
+    function executeBatch(address[] calldata dest, uint256[] calldata value, bytes[] calldata func) 
+    external 
+    _requireFromEntryPointOrFactory{
         require(dest.length == func.length && (value.length == 0 || value.length == func.length), "wrong array lengths");
         if (value.length == 0) {
             for (uint256 i = 0; i < dest.length; i++) {
