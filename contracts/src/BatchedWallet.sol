@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.19;
 
-contract BatchedWallet{
+import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+
+contract BatchedWallet is Initializable{
+
     /**
     execute a transaction directly from user or entry point
     TODO: restrict access to entry Contract and owner */
