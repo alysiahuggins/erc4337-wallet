@@ -9,9 +9,10 @@ import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import {TokenCallbackHandler} from "./callback/TokenCallbackHandler.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {UUPSUpgradeable} from "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 
 
-contract BatchedWallet is Initializable, BaseAccount, TokenCallbackHandler{
+contract BatchedWallet is Initializable, BaseAccount, TokenCallbackHandler, UUPSUpgradeable{
     using ECDSA for bytes32;
 
     address public owner;
@@ -20,7 +21,7 @@ contract BatchedWallet is Initializable, BaseAccount, TokenCallbackHandler{
     event BatchedWalletInitialized(IEntryPoint indexed entryPoint, address owners);
     event WithdrawERC20(address indexed _to, address _token, uint256 _amount);
 
-    modifier _requireFromEntryPointOrFactory() {
+    modifier _requireFromEntryPointOrOwner() {
         require(
             msg.sender == address(_entryPoint) || msg.sender == owner,
             "only entry point or wallet owner can call"
@@ -37,6 +38,9 @@ contract BatchedWallet is Initializable, BaseAccount, TokenCallbackHandler{
         _entryPoint = batchedWalletEntryPoint;
         _disableInitializers(); //prevent the this implementation from being used by locking it
     }
+
+    receive() external payable {}
+
 
     function _onlyOwner() internal view {
         //directly from EOA owner, or through the account itself (which gets redirected through execute())
@@ -57,7 +61,7 @@ contract BatchedWallet is Initializable, BaseAccount, TokenCallbackHandler{
     TODO: restrict access to entry Contract and owner */
     function execute(address dest, uint256 value, bytes calldata func) 
     external 
-    _requireFromEntryPointOrFactory{
+    _requireFromEntryPointOrOwner{
         _call(dest, value, func);
     }
 
@@ -66,7 +70,7 @@ contract BatchedWallet is Initializable, BaseAccount, TokenCallbackHandler{
     TODO: restrict access to entry Contract and owner */
     function executeBatch(address[] calldata dest, uint256[] calldata value, bytes[] calldata func) 
     external 
-    _requireFromEntryPointOrFactory{
+    _requireFromEntryPointOrOwner{
         require(dest.length == func.length && (value.length == 0 || value.length == func.length), "wrong array lengths");
         if (value.length == 0) {
             for (uint256 i = 0; i < dest.length; i++) {
@@ -140,6 +144,11 @@ contract BatchedWallet is Initializable, BaseAccount, TokenCallbackHandler{
     */
     function withdrawETHTo(address to) external onlyOwner {
         payable(to).transfer(address(this).balance);
+    }
+
+    function _authorizeUpgrade(address newImplementation) internal view override{
+        (newImplementation);
+        _onlyOwner();
     }
 
 }

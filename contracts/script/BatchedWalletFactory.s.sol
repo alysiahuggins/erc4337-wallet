@@ -13,7 +13,7 @@ contract BatchedWalletFactoryScript is Script {
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY"); // Fetch the private key from environment variables
         vm.startBroadcast(deployerPrivateKey); // Start broadcasting transactions
-        BatchedWalletFactory walletFactory = new BatchedWalletFactory(ENTRYPOINT); // Initialize the WalletFactory contract
+        new BatchedWalletFactory(ENTRYPOINT); // Initialize the WalletFactory contract
         vm.stopBroadcast(); // Stop broadcasting transactions
 
     }
