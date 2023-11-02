@@ -6,6 +6,7 @@ import {IEntryPoint} from "account-abstraction/interfaces/IEntryPoint.sol";
 import {BaseAccount} from "account-abstraction/core/BaseAccount.sol";
 import {UserOperation} from "account-abstraction/interfaces/UserOperation.sol";
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import {MessageHashUtils} from "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 import {TokenCallbackHandler} from "./callback/TokenCallbackHandler.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -113,7 +114,7 @@ contract BatchedWallet is Initializable, BaseAccount, TokenCallbackHandler, UUPS
     override 
     virtual 
     returns (uint256 validationData) {
-        bytes32 hash = userOpHash.toEthSignedMessageHash();
+        bytes32 hash = MessageHashUtils.toEthSignedMessageHash(userOpHash);
         if (owner != hash.recover(userOp.signature))
             return SIG_VALIDATION_FAILED;
         return 0;
