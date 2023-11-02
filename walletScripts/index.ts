@@ -25,7 +25,7 @@ async function main() {
 
   // Entry point and factory addresses for Polygon Mumbai testnet
   const entryPointAddress = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789';
-  const factoryAddress = '0x1767f4E178d51ED64131a81A70B5dCF59C774c43'//'0xe3389Ad7DF1C98BaC2DB556bE4ABb03bFb1734f6'//'0x7Eb55f83A80eD9BF530410C713454D948EA43744';
+  const factoryAddress = '0x1767f4E178d51ED64131a81A70B5dCF59C774c43'; //if you redeploy the wallet factory then replace this address with the new contract address
 
   const paymasterContext = {type: "payg"};
   const paymaster = Presets.Middleware.verifyingPaymaster(

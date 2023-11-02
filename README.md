@@ -33,6 +33,18 @@ Create a file named, `.env`, copy the contents of `.env.example` and replace the
 $ ts-node index.ts
 ```
 
+#### View the transactions
+You'll see the transactions on the Polygon Mumbai testnet.
+https://mumbai.polygonscan.com/
+Copy the hashes that was output from this script.
+
+Here's an example Batched Transaction
+![BatchedTransactionExample](image.png)
+
+<br/>
+<br/>
+
+
 ### Running smart contract tests using forge
 #### Navigate to the contracts directory via terminal
 Go to the contracts directory
@@ -45,6 +57,10 @@ Run the tests
 $ forge test --summary
 ```
 
+
+<br/>
+<br/>
+
 ### Deploying your own wallet factory using the code
 #### Navigate to the contracts directory via terminal
 Go to the contracts directory
@@ -54,14 +70,13 @@ $ cd contracts
 
 #### Populate Environment
 Create a file named, `.env`, copy the contents of `.env.example` and replace the fields with their values.
-
-#### Run the script to deploy the factory contract
-```bash
-$ ts-node index.ts
-```
+Feel free to use the privatekey that you attained in the previous steps. But you must first fund it with testnet matic tokens.
+Try mumbaifaucet.com. 
 
 #### Run the script to deploy the test erc20 contract
 ```bash
-$ source .env
 $ forge script script/BatchedWalletFactory.s.sol --rpc-url $MUMBAI_RPC_URL --broadcast -vvv
 ```
+
+#### Testing this new walletfactory in walletScripts
+Navigate to the Wallet Scripts directory and replace the contract adress from this deployment with the factory Contract address on line 28
